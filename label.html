@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор на етикети за кафе</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .controls {
+            width: 350px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .controls h2 { margin-top: 0; color: #333; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #555; }
+        .form-group input[type="text"], 
+        .form-group input[type="number"],
+        .form-group input[type="date"] {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+
+        .checkbox-group { display: flex; flex-direction: column; gap: 5px; }
+        .checkbox-label { display: flex; align-items: center; font-size: 14px; cursor: pointer; }
+        .checkbox-label input { margin-right: 8px; }
+
+        .roast-select { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        
+        button#printBtn {
+            background-color: #2c3e50; color: white; border: none; padding: 12px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px;
+            transition: background 0.2s;
+        }
+        button#printBtn:hover { background-color: #1a252f; }
+
+        .preview-area {
+            flex-grow: 1;
+            background-color: #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .label-container {
+            width: 4in;
+            height: 6in;
+            background: white;
+            padding: 0.2in;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .section { border-bottom: 2px solid black; padding-bottom: 8px; margin-bottom: 8px; }
+        .section:last-child { border: none; margin: 0; padding: 0; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .title-section { 
+            text-align: center; 
+            padding-top: 10px;
+            padding-bottom: 15px;
+        }
+        .coffee-title { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 20px; font-weight: 900; text-transform: uppercase; line-height: 1.2; margin: 0; }
+
+        .row { display: flex; flex-wrap: nowrap; align-items: center; margin-bottom: 5px; }
+        .tight-row { justify-content: space-between; }
+        
+        .checkbox-item { display: flex; align-items: center; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: bold; white-space: nowrap; }
+        .box { font-size: 18px; margin-right: 4px; line-height: 1; padding-bottom: 2px; }
+
+        .sca-group { margin-left: auto; font-weight: bold; font-size: 14px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        
+        .composition-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: bold; }
+
+        .roast-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 5px; column-gap: 10px; }
+
+        .date-row { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: bold; margin-top: 5px; margin-bottom: 15px; white-space: nowrap; }
+        
+        .description { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; line-height: 1.6; text-align: justify; flex-grow: 1; }
+
+        @media print {
+            body { background: white; height: auto; overflow: visible; display: block; }
+            .controls, .preview-area { display: none; }
+            
+            .label-container {
+                display: flex !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4in;
+                height: 6in;
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+            }
+            @page { size: 4in 6in; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>⚙️ Настройки на етикета</h2>
+        
+        <div class="form-group">
+            <label>Наименование на кафето:</label>
+            <input type="text" id="inputTitle" value="BRAZILIA Caramelo Doce Fazenda Paraiso" oninput="updateLabel()">
+        </div>
+
+        <div class="form-group">
+            <label>Вид (Checkboxes):</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" id="chkEstate" onchange="updateLabel()"> Single Estate</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkOrigin" onchange="updateLabel()"> Single Origin</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkBlend" onchange="updateLabel()"> Blend</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkSpecialty" checked onchange="updateLabel()"> Specialty Coffee</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>SCA Точки (напр. 85.5):</label>
+            <input type="number" id="inputSCA" step="0.1" placeholder="80.0" oninput="updateLabel()">
+        </div>
+
+        <div class="form-group">
+            <label>Състав (%):</label>
+            <input type="number" id="inputArabica" placeholder="Arabica %" oninput="updateLabel()">
+            <div style="height: 5px;"></div>
+            <input type="number" id="inputCanephora" placeholder="Canephora %" oninput="updateLabel()">
+            <div style="height: 5px;"></div>
+            <input type="number" id="inputLiberica" placeholder="Liberica %" oninput="updateLabel()">
+        </div>
+
+        <div class="form-group">
+            <label>Степен на изпичане:</label>
+            <div class="roast-select">
+                <label class="checkbox-label"><input type="radio" name="roast" value="Cinnamon" onchange="updateLabel()"> Cinnamon</label>
+                <label class="checkbox-label"><input type="radio" name="roast" value="City" onchange="updateLabel()"> City</label>
+                <label class="checkbox-label"><input type="radio" name="roast" value="New England" onchange="updateLabel()"> New England</label>
+                <label class="checkbox-label"><input type="radio" name="roast" value="Full City" onchange="updateLabel()"> Full City</label>
+                <label class="checkbox-label"><input type="radio" name="roast" value="American" onchange="updateLabel()"> American</label>
+                <label class="checkbox-label"><input type="radio" name="roast" value="Vienna" onchange="updateLabel()"> Vienna</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Дата на изпичане:</label>
+            <input type="date" id="inputDate" onchange="updateLabel()">
+        </div>
+
+        <button id="printBtn" onclick="window.print()">🖨️ Принтирай Етикет</button>
+    </div>
+
+    <div class="preview-area">
+        <div class="label-container" id="labelPrint">
+            
+            <div class="section title-section">
+                <h1 class="coffee-title" id="lblTitle">BRAZILIA Caramelo Doce Fazenda Paraiso</h1>
+            </div>
+
+            <div class="section">
+                <div class="row tight-row">
+                    <div class="checkbox-item"><span class="box" id="boxEstate">☐</span> Single estate</div>
+                    <div class="checkbox-item"><span class="box" id="boxOrigin">☐</span> Single origin</div>
+                    <div class="checkbox-item"><span class="box" id="boxBlend">☐</span> Blend</div>
+                </div>
+                
+                <div class="row" style="justify-content: space-between; margin-top: 8px;">
+                    <div class="checkbox-item"><span class="box" id="boxSpecialty">☐</span> Specialty coffee</div>
+                    <div class="sca-group"><span id="lblSCA">_______</span> SCA</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="composition-row">
+                    <span>Arabica <span id="lblArabica">_______</span> %</span>
+                    <span>Canephora <span id="lblCanephora">_______</span> %</span>
+                </div>
+                <div class="composition-row">
+                    <span>Liberica <span id="lblLiberica">_______</span> %</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="roast-grid">
+                    <div class="checkbox-item"><span class="box" id="boxCinnamon">☐</span> Cinnamon</div>
+                    <div class="checkbox-item"><span class="box" id="boxCity">☐</span> City</div>
+                    <div class="checkbox-item"><span class="box" id="boxNewEngland">☐</span> New England</div>
+                    <div class="checkbox-item"><span class="box" id="boxFullCity">☐</span> Full City</div>
+                    <div class="checkbox-item"><span class="box" id="boxAmerican">☐</span> American</div>
+                    <div class="checkbox-item"><span class="box" id="boxVienna">☐</span> Vienna</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="date-row">
+                    This coffee was roasted on: &nbsp;<span id="lblFullDate"></span>
+                </div>
+                
+                <div class="description">
+                    It will begin to actively develop its flavors and aromas after the 3rd day from that date. Their peak will be around days 10–14, after which they will slowly start to fade. It is recommended that you consume this coffee within one month of the roasting date. It will still be good to drink until around the third month, but after that, much of its distinctive flavor and aroma will be lost.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
+            updateLabel();
+        };
+
+        function updateLabel() {
+            // Update Title
+            const title = document.getElementById('inputTitle').value;
+            document.getElementById('lblTitle').innerText = title ? title : " ";
+
+            // Update Checkboxes
+            toggleBox('chkEstate', 'boxEstate');
+            toggleBox('chkOrigin', 'boxOrigin');
+            toggleBox('chkBlend', 'boxBlend');
+            toggleBox('chkSpecialty', 'boxSpecialty');
+
+            // Update SCA
+            let sca = document.getElementById('inputSCA').value;
+            if (sca) {
+                if(!sca.includes('.')) sca += ".0";
+                document.getElementById('lblSCA').innerText = sca;
+            } else {
+                document.getElementById('lblSCA').innerText = "_______";
+            }
+
+            // Update Percentages
+            updateText('inputArabica', 'lblArabica');
+            updateText('inputCanephora', 'lblCanephora');
+            updateText('inputLiberica', 'lblLiberica');
+
+            // Update Roast
+            const roasts = ['Cinnamon', 'City', 'New England', 'FullCity', 'American', 'Vienna'];
+            roasts.forEach(r => {
+                document.getElementById('box' + r.replace(/\s/g, '')).innerHTML = '&#9744;'; 
+            });
+            const selectedRoast = document.querySelector('input[name="roast"]:checked');
+            if (selectedRoast) {
+                const val = selectedRoast.value.replace(/\s/g, ''); 
+                document.getElementById('box' + val).innerHTML = '&#9745;'; 
+            }
+
+            const dateVal = document.getElementById('inputDate').value;
+            if (dateVal) {
+                const parts = dateVal.split("-");
+                const year = parts[0];
+                const monthIndex = parseInt(parts[1]) - 1;
+                const day = parts[2];
+
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const monthName = months[monthIndex];
+
+                // Формат: 20 Nov 2025
+                document.getElementById('lblFullDate').innerText = `${day} ${monthName} ${year}`;
+            } else {
+                document.getElementById('lblFullDate').innerText = "____ ___ ____";
+            }
+        }
+
+        function toggleBox(inputId, boxId) {
+            const isChecked = document.getElementById(inputId).checked;
+            document.getElementById(boxId).innerHTML = isChecked ? '&#9745;' : '&#9744;';
+        }
+
+        function updateText(inputId, targetId) {
+            const val = document.getElementById(inputId).value;
+            document.getElementById(targetId).innerText = val ? val : "_______";
+        }
+    </script>
+
+</body>
+</html>
