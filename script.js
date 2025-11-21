@@ -4,6 +4,8 @@ window.onload = function() {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
+    
+    renderHistoryDropdown();
     updateLabel();
 };
 
@@ -189,7 +191,6 @@ function validateAndUpdateComposition() {
         }
     }
     else if (isEstate || isOrigin) {
-        // Ако нито едно от трите не е равно на 100 (т.е. имаме смес) -> грешка
         if (valA !== 100 && valC !== 100 && valL !== 100) {
             isValid = false;
             message = "Single Origin/Estate must be 100% of one type!";
@@ -231,5 +232,118 @@ function checkExclusive(el) {
             }
         });
     }
+    updateLabel();
+}
+
+function handlePrint() {
+    saveToHistory(); 
+    window.print();
+}
+
+function saveToHistory() {
+    const title = document.getElementById('inputTitle').value;
+    if (!title) return; 
+
+    const currentState = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        title: title,
+        origin: document.getElementById('inputOrigin').value,
+        altitude: document.getElementById('inputAltitude').value,
+        qr: document.getElementById('inputQR').value,
+        
+        isEstate: document.getElementById('chkEstate').checked,
+        isOrigin: document.getElementById('chkOrigin').checked,
+        isBlend: document.getElementById('chkBlend').checked,
+        
+        sca: document.getElementById('inputSCA').value,
+        roast: document.querySelector('input[name="roast"]:checked')?.value,
+        processing: Array.from(document.querySelectorAll('.proc-chk:checked')).map(cb => cb.value),
+        
+        arabica: document.getElementById('inputArabica').value,
+        canephora: document.getElementById('inputCanephora').value,
+        liberica: document.getElementById('inputLiberica').value,
+        
+        profile: document.getElementById('inputProfile').value,
+        body: document.getElementById('inputBody').value,
+        acidity: document.getElementById('inputAcidity').value,
+        
+        flavors: document.getElementById('inputFlavors').value,
+        date: document.getElementById('inputDate').value
+    };
+
+    let history = JSON.parse(localStorage.getItem('coffeeLabelHistory') || '[]');
+    history.unshift(currentState);
+
+    if (history.length > 10) {
+        history = history.slice(0, 10);
+    }
+
+    localStorage.setItem('coffeeLabelHistory', JSON.stringify(history));
+    renderHistoryDropdown();
+}
+
+function renderHistoryDropdown() {
+    const history = JSON.parse(localStorage.getItem('coffeeLabelHistory') || '[]');
+    const select = document.getElementById('historySelect');
+    
+    select.innerHTML = '<option value="">-- Select a previous label --</option>';
+
+    history.forEach((item, index) => {
+        const opt = document.createElement('option');
+        opt.value = index; 
+        opt.innerText = `${item.title} (${item.timestamp})`;
+        select.appendChild(opt);
+    });
+}
+
+function loadFromHistory(index) {
+    if (index === "") return;
+
+    const history = JSON.parse(localStorage.getItem('coffeeLabelHistory') || '[]');
+    const state = history[index];
+
+    if (!state) return;
+
+    document.getElementById('inputTitle').value = state.title;
+    document.getElementById('inputOrigin').value = state.origin;
+    document.getElementById('inputAltitude').value = state.altitude;
+    document.getElementById('inputQR').value = state.qr;
+
+    document.getElementById('chkEstate').checked = state.isEstate;
+    document.getElementById('chkOrigin').checked = state.isOrigin;
+    document.getElementById('chkBlend').checked = state.isBlend;
+
+    document.getElementById('inputSCA').value = state.sca;
+
+    if (state.roast) {
+        const roastRadio = document.querySelector(`input[name="roast"][value="${state.roast}"]`);
+        if (roastRadio) roastRadio.checked = true;
+    }
+
+    document.querySelectorAll('.proc-chk').forEach(cb => cb.checked = false);
+    if (state.processing && state.processing.length > 0) {
+        state.processing.forEach(val => {
+            const cb = document.querySelector(`.proc-chk[value="${val}"]`);
+            if (cb) cb.checked = true;
+        });
+    }
+
+    document.getElementById('inputArabica').value = state.arabica;
+    document.getElementById('inputCanephora').value = state.canephora;
+    document.getElementById('inputLiberica').value = state.liberica;
+
+    if (state.profile) document.getElementById('inputProfile').value = state.profile;
+    else document.getElementById('inputProfile').value = "";
+
+    if (state.body) document.getElementById('inputBody').value = state.body;
+    else document.getElementById('inputBody').value = "";
+
+    if (state.acidity) document.getElementById('inputAcidity').value = state.acidity;
+    else document.getElementById('inputAcidity').value = "";
+
+    document.getElementById('inputFlavors').value = state.flavors;
+    document.getElementById('inputDate').value = state.date;
+
     updateLabel();
 }

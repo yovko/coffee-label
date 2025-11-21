@@ -225,7 +225,7 @@ button#printBtn:hover { background-color: #1a252f; }
     .controls { 
         display: none; 
     }
-
+    
     .preview-area { 
         display: block; 
         background: none;

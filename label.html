@@ -12,9 +12,16 @@
     <div class="controls">
         <h2>⚙️ Label Settings</h2>
         
+        <div class="form-group" style="background: #e8f0fe; padding: 10px; border-radius: 5px; border: 1px solid #b8cce4;">
+            <label style="color: #1a73e8;">🕒 History (Last 10):</label>
+            <select id="historySelect" onchange="loadFromHistory(this.value)">
+                <option value="">-- Select a previous label --</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label>Coffee Name:</label>
-            <input type="text" id="inputTitle" value="PANAMA Finca La Vanguardia" placeholder="Enter coffee name" oninput="updateLabel()">
+            <input type="text" id="inputTitle" value="PANAMA Finca La Vanguardia Pacamara" placeholder="Enter coffee name" oninput="updateLabel()">
         </div>
 
         <div class="form-group">
@@ -118,6 +125,7 @@
                 <option value="High">High</option>
             </select>
         </div>
+
         <div class="form-group">
             <label>Tasting Notes (free text):</label>
             <input type="text" id="inputFlavors" placeholder="e.g. Chocolate, Nuts, Berries" oninput="updateLabel()">
@@ -128,7 +136,7 @@
             <input type="date" id="inputDate" onchange="updateLabel()">
         </div>
 
-        <button id="printBtn" onclick="window.print()">🖨️ Print Label</button>
+        <button id="printBtn" onclick="handlePrint()">🖨️ Print & Save Label</button>
     </div>
 
     <div class="preview-area">
