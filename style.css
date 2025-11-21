@@ -23,11 +23,21 @@ body {
 
 .form-group { margin-bottom: 10px; }
 .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #555; }
+
 .form-group input[type="text"], 
 .form-group input[type="number"],
-.form-group input[type="date"] {
-    width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+.form-group input[type="date"],
+.form-group select {
+    width: 100%; 
+    padding: 8px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    box-sizing: border-box;
     transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group select {
+    background: white;
 }
 
 .input-error {
@@ -166,11 +176,22 @@ button#printBtn:hover { background-color: #1a252f; }
 
 .date-row { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: bold; margin-top: 5px; margin-bottom: 15px; white-space: nowrap; }
 
-.flavor-row {
+.descriptors-row {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 13px;
     font-weight: normal;
-    text-align: left;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    color: #000;
+    display: flex;
+    gap: 20px; 
+}
+
+.flavor-row {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;      
+    font-weight: normal;  
+    text-align: left;     
     margin-top: 0px;
     margin-bottom: 5px;
     color: #000;
@@ -193,29 +214,26 @@ button#printBtn:hover { background-color: #1a252f; }
     margin-top: 2px;        
 }
 
-.form-group select {
-    width: 100%; 
-    padding: 8px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    box-sizing: border-box;
-    background: white;
-}
-
-.descriptors-row {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 13px;
-    font-weight: normal;
-    margin-top: 0px;
-    margin-bottom: 5px;
-    color: #000;
-    display: flex;
-    gap: 20px;
-}
-
 @media print {
-    body { background: white; height: auto; overflow: visible; display: block; }
-    .controls, .preview-area { display: none; }
+    body { 
+        background: white; 
+        height: auto; 
+        overflow: visible; 
+        display: block; 
+    }
+
+    .controls { 
+        display: none; 
+    }
+
+    .preview-area { 
+        display: block; 
+        background: none;
+        padding: 0;
+        margin: 0;
+        width: auto;
+        height: auto;
+    }
     
     .label-container {
         display: flex !important;
@@ -228,6 +246,8 @@ button#printBtn:hover { background-color: #1a252f; }
         box-shadow: none;
         margin: 0;
         page-break-after: always;
+        visibility: visible;
     }
+    
     @page { size: 4in 6in; margin: 0; }
 }
