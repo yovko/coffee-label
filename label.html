@@ -14,7 +14,7 @@
         
         <div class="form-group">
             <label>Coffee Name:</label>
-            <input type="text" id="inputTitle" value="BRAZILIA Caramelo Doce Fazenda Paraiso" oninput="updateLabel()">
+            <input type="text" id="inputTitle" value="PANAMA Finca La Vanguardia" placeholder="Enter coffee name" oninput="updateLabel()">
         </div>
 
         <div class="form-group">
@@ -87,6 +87,38 @@
         </div>
 
         <div class="form-group">
+            <label>Profile:</label>
+            <select id="inputProfile" onchange="updateLabel()">
+                <option value="">-- None --</option>
+                <option value="Fruity">Fruity</option>
+                <option value="Floral">Floral</option>
+                <option value="Chocolaty">Chocolaty</option>
+                <option value="Exotic">Exotic</option>
+                <option value="Winey">Winey</option>
+                <option value="Lactic">Lactic</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Body:</label>
+            <select id="inputBody" onchange="updateLabel()">
+                <option value="">-- None --</option>
+                <option value="Full">Full</option>
+                <option value="Medium">Medium</option>
+                <option value="Light">Light</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Acidity:</label>
+            <select id="inputAcidity" onchange="updateLabel()">
+                <option value="">-- None --</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label>Tasting Notes (free text):</label>
             <input type="text" id="inputFlavors" placeholder="e.g. Chocolate, Nuts, Berries" oninput="updateLabel()">
         </div>
@@ -103,7 +135,7 @@
         <div class="label-container" id="labelPrint">
             
             <div class="section title-section">
-                <h1 class="coffee-title" id="lblTitle">BRAZILIA Caramelo Doce Fazenda Paraiso</h1>
+                <h1 class="coffee-title" id="lblTitle">PANAMA Finca La Vanguardia Pacamara</h1>
                 <div id="lblOrigin" class="origin-subtitle" style="display:none;"></div>
                 
                 <div class="row" style="margin-top: 12px; justify-content: center; gap: 10px; align-items: center; flex-wrap: nowrap;">
@@ -146,6 +178,8 @@
             </div>
 
             <div class="section">
+                <div id="lblDescriptors" class="descriptors-row" style="display:none;"></div>
+
                 <div id="lblFlavors" class="flavor-row" style="display:none;"></div>
 
                 <div class="date-row">

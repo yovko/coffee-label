@@ -49,7 +49,7 @@ function updateLabel() {
     toggleBox('chkOrigin', 'boxOrigin');
     toggleBox('chkBlend', 'boxBlend');
 
-    // Logic for Blend vs SCA
+    // Logic for Blend vs SCA & Layout
     const isBlend = document.getElementById('chkBlend').checked;
     const inputSCA = document.getElementById('inputSCA');
     const scaWrapper = document.getElementById('wrapSCA');
@@ -88,16 +88,37 @@ function updateLabel() {
     // Update Composition
     validateAndUpdateComposition();
 
+    // --- Profile, Body, Acidity Logic ---
+    const profileVal = document.getElementById('inputProfile') ? document.getElementById('inputProfile').value : "";
+    const bodyVal = document.getElementById('inputBody') ? document.getElementById('inputBody').value : "";
+    const acidityVal = document.getElementById('inputAcidity') ? document.getElementById('inputAcidity').value : "";
+    
+    const descContainer = document.getElementById('lblDescriptors');
+    if (descContainer) {
+        let descParts = [];
+        if(profileVal) descParts.push(`<strong>Profile:</strong> ${profileVal}`);
+        if(bodyVal) descParts.push(`<strong>Body:</strong> ${bodyVal}`);
+        if(acidityVal) descParts.push(`<strong>Acidity:</strong> ${acidityVal}`);
+
+        if (descParts.length > 0) {
+            descContainer.style.display = "flex";
+            descContainer.innerHTML = descParts.map(p => `<span>${p}</span>`).join(""); 
+        } else {
+            descContainer.style.display = "none";
+        }
+    }
+
+    // Update Flavors
     const flavors = document.getElementById('inputFlavors').value;
     const flavorEl = document.getElementById('lblFlavors');
     if (flavors && flavors.trim() !== "") {
         flavorEl.style.display = "block";
-        // Bold за "Tasting notes:", нормален шрифт за останалото
         flavorEl.innerHTML = `<strong>Tasting notes:</strong> ${flavors}`;
     } else {
         flavorEl.style.display = "none";
     }
 
+    // Update Date
     const dateVal = document.getElementById('inputDate').value;
     if (dateVal) {
         const parts = dateVal.split("-");
@@ -138,6 +159,10 @@ function toggleBox(inputId, boxId) {
 }
 
 function validateAndUpdateComposition() {
+    const isBlend = document.getElementById('chkBlend').checked;
+    const isEstate = document.getElementById('chkEstate').checked;
+    const isOrigin = document.getElementById('chkOrigin').checked;
+
     const arabicaInput = document.getElementById('inputArabica');
     const canephoraInput = document.getElementById('inputCanephora');
     const libericaInput = document.getElementById('inputLiberica');
@@ -150,13 +175,34 @@ function validateAndUpdateComposition() {
 
     const inputs = [arabicaInput, canephoraInput, libericaInput];
     
-    if (sum === 100) {
+    let isValid = true;
+    let message = "";
+
+    if (sum !== 100) {
+        isValid = false;
+        message = `Current sum: ${sum}% (Must be 100%)`;
+    } 
+    else if (isBlend) {
+        if (valA === 100 || valC === 100 || valL === 100) {
+            isValid = false;
+            message = "Blend cannot be 100% single type!";
+        }
+    }
+    else if (isEstate || isOrigin) {
+        // Ако нито едно от трите не е равно на 100 (т.е. имаме смес) -> грешка
+        if (valA !== 100 && valC !== 100 && valL !== 100) {
+            isValid = false;
+            message = "Single Origin/Estate must be 100% of one type!";
+        }
+    }
+
+    if (isValid) {
         inputs.forEach(inp => inp.classList.remove('input-error'));
         errorMsg.style.display = 'none';
     } else {
         inputs.forEach(inp => inp.classList.add('input-error'));
         errorMsg.style.display = 'block';
-        errorMsg.innerText = `Current sum: ${sum}% (Must be 100%)`;
+        errorMsg.innerText = message;
     }
 
     updateSingleComp(arabicaInput.value, 'wrapArabica', 'lblArabica');
@@ -172,4 +218,18 @@ function updateSingleComp(val, wrapperId, lblId) {
     } else {
         wrapper.style.display = "none";
     }
+}
+
+function checkExclusive(el) {
+    if (el.checked) {
+        const exclusives = ['Natural', 'Honey', 'Washed'];
+        const checkboxes = document.querySelectorAll('.proc-chk');
+        
+        checkboxes.forEach(cb => {
+            if (exclusives.includes(cb.value) && cb !== el) {
+                cb.checked = false;
+            }
+        });
+    }
+    updateLabel();
 }

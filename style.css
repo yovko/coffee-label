@@ -168,9 +168,9 @@ button#printBtn:hover { background-color: #1a252f; }
 
 .flavor-row {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 13px;      /* Същият размер като описанието */
-    font-weight: normal;  /* Нормална дебелина */
-    text-align: left;     /* Подравнено вляво */
+    font-size: 13px;
+    font-weight: normal;
+    text-align: left;
     margin-top: 0px;
     margin-bottom: 5px;
     color: #000;
@@ -191,6 +191,26 @@ button#printBtn:hover { background-color: #1a252f; }
     margin-left: 15px;      
     margin-bottom: 5px;     
     margin-top: 2px;        
+}
+
+.form-group select {
+    width: 100%; 
+    padding: 8px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    box-sizing: border-box;
+    background: white;
+}
+
+.descriptors-row {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    color: #000;
+    display: flex;
+    gap: 20px;
 }
 
 @media print {
