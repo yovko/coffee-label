@@ -1,6 +1,6 @@
 # Coffee Label Generator
 
-A lightweight, browser-based tool for generating and printing professional coffee roast labels. Built with vanilla HTML, CSS, and JavaScript, this application requires no backend and runs directly in your browser.
+A lightweight, browser-based tool for generating and printing professional coffee roast labels. Built with vanilla HTML, CSS, and JavaScript, this application requires no backend and runs directly in the browser.
 
 ## Features
 
@@ -10,7 +10,7 @@ A lightweight, browser-based tool for generating and printing professional coffe
 * **Local History:** Automatically saves the last 10 printed labels to your browser's Local Storage for quick reloading.
 * **Dynamic Layouts:** Adjusts the visual arrangement based on whether the coffee is a Blend or Single Origin.
 * **Detailed Attributes:** Support for SCA Score, Roast Level, Processing Method (with mutual exclusivity logic), Profile, Body, Acidity, and Tasting Notes.
-* **QR Code Generation:** Integrated QR code generator for product links.
+* **QR Code Generation:** Integrated QR code generator for product links (thanks to [qrcodejs](https://davidshimjs.github.io/qrcodejs/)).
 
 ## How to Use
 
